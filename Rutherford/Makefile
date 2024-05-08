@@ -1,25 +1,28 @@
 
 CC = g++
-CFLAGS = -Wall
+CFLAGS = -Wall -std=c++11 -g
 
 SRC = $(wildcard src/*.cpp)
 HEADS = $(wildcard src/*.hpp)
 
-# LIB = $(wildcard lib/*)
-LIB = 
+LIB = libs/
+INCLUDE = libs/
 
+libs = -L$(LIB) -I$(INCLUDE) -lSDL2main  -lSDL2
 
-default:
-
+build:
+	@echo $(libs)
 	@echo "Compiling the source files..."
 	@echo "Source files: "$(SRC)
 	@echo "Header files :"$(HEADS)
 	@echo "Library files: "$(LIB)
 
-
-
-	$(CC) $(CFLAGS) $(SRC) -Isrc -lSDL2main -lSDL2 -o build/Build 
+	$(CC) $(CFLAGS) $(SRC) $(libs) -o build/Build 
 
 run:
 	@echo "Running the program..."
 	@./build/Build
+
+all:	
+	build
+	run

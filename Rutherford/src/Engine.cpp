@@ -15,9 +15,9 @@ Engine::Engine(){
             break;
     }
 
-    Particle* p = new Particle();
-    particles.push_back(p);
-    std::cout << particles.size() << std::endl;
+    // Particle* p = new Particle();
+    // particles.push_back(p);
+    // std::cout << particles.size() << std::endl;
     
 }
 
