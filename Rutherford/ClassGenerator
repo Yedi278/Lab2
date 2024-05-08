@@ -1,0 +1,45 @@
+# Class generator for bash systems
+# this file MUST be in the same directory as the src folder
+# first argument is the name of the class
+
+DIR=$(pwd)
+
+# Check if no arguments where given
+if [ "$#" -eq "0" ]; then
+    echo "No arguments provided"
+    echo "Usage: ./ClassGenerator.sh [class name]"
+    exit 1
+fi
+
+##
+
+
+RM=0
+
+for arg in "$@";
+do
+
+    if [ "$arg" == "-h" ] || [ "$arg" == "--help" ]
+    then
+        echo "Usage: ./ClassGenerator.sh [class name]"
+        exit 1
+    
+    elif [ "$arg" == "-rm" ] || [ "$arg" == "--remove" ]
+    then
+        RM=1
+        continue
+    fi
+
+    if [ $RM == 1 ]
+    then
+        rm src/$arg.hpp
+        rm src/$arg.cpp
+        exit 1
+        
+    else
+        touch src/$arg.hpp
+        touch src/$arg.cpp
+        exit 1
+    fi
+
+done

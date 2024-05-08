@@ -1,35 +1,36 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "Engine.hpp"
-
-#define FPS 1
+#include "Vector.hpp"
+#undef main
+#define FPS 60
 
 
 Uint32 a = 0;
-Uint32 b = 0;
 
 int main() {
     
 
-    Engine* eng = nullptr;
-    eng = new Engine();
+    Engine* eng = new Engine();
+
+    a = SDL_GetTicks();
     
-    int init_param = eng->init();
 
-    if (0 == init_param){
-        eng->running = true;
-    }
-
+    
     while (eng->running == true){
         
-        a = SDL_GetTicks();
+        // break;
 
         while(SDL_GetTicks() - a < 1000/FPS){
             
             eng->handleEvents();
-            
+
         }
+
         eng->run();
+
+        // std::cout << "FPS: " << 1000./float(SDL_GetTicks() - a) << '\n'; #print the FPS
+        a = SDL_GetTicks();
     }
     eng->shutdown();
 
