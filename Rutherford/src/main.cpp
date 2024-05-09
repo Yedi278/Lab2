@@ -30,6 +30,7 @@ int main() {
         }
 
         eng->render();
+        eng->update();
 
         // std::cout << "FPS: " << 1000./float(SDL_GetTicks() - a) << '\n'; #print the FPS
         a = SDL_GetTicks();

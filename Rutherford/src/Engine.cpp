@@ -58,6 +58,13 @@ void Engine::addElectron(){
 
 void Engine::update(){
     // Update the engine
+
+    for (auto part : electrons){
+        // Vector dst = proton->pos;
+        std::cout << part << '\t' << (*part->pos - *proton->pos).x << std::endl;
+        // std::cout << (*proton->pos - *part->pos).mod() << std::endl;
+    }
+
 }
 
 void Engine::render(){

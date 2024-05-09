@@ -24,7 +24,7 @@ public:
 
 
     std::vector<Particle*> electrons;
-    Particle* proton = new Particle(new Vector(400, 300), new Vector(0, 0), new Vector(0, 0), 1000, 40, 4);
+    Particle* proton = new Particle(new Vector(0,0), new Vector(0, 0), new Vector(0, 0), 1000, 40, 4);
 
 private:
 
