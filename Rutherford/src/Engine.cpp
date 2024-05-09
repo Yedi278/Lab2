@@ -1,5 +1,6 @@
 #include "Engine.hpp"
-
+#define WIDTH 800
+#define HEIGHT 600
 
 Engine::Engine(){
     // Constructor
@@ -14,10 +15,6 @@ Engine::Engine(){
             running = false;
             break;
     }
-
-    // Particle* p = new Particle();
-    // particles.push_back(p);
-    // std::cout << particles.size() << std::endl;
     
 }
 
@@ -37,7 +34,7 @@ int Engine::init(){
         return -1;
     }
 
-    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, false);
+    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, false);
     if(window == NULL){
         std::cerr << "Error creating window:"<< std::endl;
         return -1;
@@ -51,11 +48,11 @@ int Engine::init(){
     return 1;
 }
 
-void Engine::addParticle(){
+void Engine::addElectron(){
     // Run the engine
     Particle* p = new Particle();
-    p->pos = new Vector(400, 300);
-    particles.emplace_back(p);
+    p->pos = new Vector(10, rand() % HEIGHT);
+    electrons.emplace_back(p);
 
 }
 
@@ -68,10 +65,12 @@ void Engine::render(){
     SDL_RenderClear(renderer);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
-    for (auto part : particles){
+    for (auto part : electrons){
         part->render(renderer);
     }
-    
+
+    proton->render(renderer, RED);
+
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderPresent(renderer);
 }

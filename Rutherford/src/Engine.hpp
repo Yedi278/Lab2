@@ -20,10 +20,11 @@ public:
     void update();
     void shutdown();
 
-    void addParticle();
+    void addElectron();
 
 
-    std::vector<Particle*> particles;
+    std::vector<Particle*> electrons;
+    Particle* proton = new Particle(new Vector(400, 300), new Vector(0, 0), new Vector(0, 0), 1000, 40, 4);
 
 private:
 

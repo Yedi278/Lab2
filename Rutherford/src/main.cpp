@@ -6,17 +6,19 @@
 #define FPS 60
 
 
-Uint32 a = 0;
+Uint32 a;
 
 int main() {
-    
-    
 
     Engine* eng = new Engine();
 
     a = SDL_GetTicks();
     
-    eng->addParticle();
+    eng->addElectron();
+    eng->addElectron();
+    eng->addElectron();
+    eng->addElectron();
+
     
     while (eng->running == true){
         

@@ -13,12 +13,14 @@ public:
     Vector* acc = nullptr;
 
     float mass = 1;
-    float q = 1;
-    float radius = 20;
+    float q = -1;
+    float radius = 5;
 
     Particle();
     Particle(Vector* pos, Vector* vel, Vector* acc, float mass, float radius, float q);
     ~Particle();
 
     void render(SDL_Renderer* renderer);
+    void render(SDL_Renderer* renderer, int r, int g, int b, int a);
+
 };
