@@ -11,7 +11,7 @@ class Engine{
 public:
 
     bool running = false;
-    const char* title = "SDL2 Engine";
+    const char* title = "Rutherford Scattering Simulation";
 
     Engine();
     ~Engine();
@@ -20,12 +20,14 @@ public:
     void handleEvents();
     void render();
     void update();
-    void run();
     void shutdown();
 
-private:
+    void addParticle();
 
-    std::vector<Particle> particles;
+
+    std::vector<Particle*> particles;
+
+private:
 
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;

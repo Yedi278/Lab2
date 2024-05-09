@@ -51,11 +51,11 @@ int Engine::init(){
     return 1;
 }
 
-void Engine::run(){
+void Engine::addParticle(){
     // Run the engine
-    SDL_RenderClear(renderer);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderPresent(renderer);
+    Particle* p = new Particle();
+    p->pos = Vector(400, 300);
+    particles.emplace_back(p);
 
 }
 
@@ -65,6 +65,14 @@ void Engine::update(){
 
 void Engine::render(){
     // Render the engine
+    SDL_RenderClear(renderer);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+    for (auto part : particles){
+        part->render(renderer);
+    }
+    
+    SDL_RenderPresent(renderer);
 }
 
 void Engine::shutdown(){

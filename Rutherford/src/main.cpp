@@ -20,7 +20,6 @@ int main() {
     
     while (eng->running == true){
         
-        // break;
 
         while(SDL_GetTicks() - a < 1000/FPS){
             
@@ -28,7 +27,7 @@ int main() {
 
         }
 
-        eng->run();
+        eng->render();
 
         // std::cout << "FPS: " << 1000./float(SDL_GetTicks() - a) << '\n'; #print the FPS
         a = SDL_GetTicks();
