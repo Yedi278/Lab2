@@ -16,7 +16,7 @@ int main() {
 
     a = SDL_GetTicks();
     
-
+    eng->addParticle();
     
     while (eng->running == true){
         

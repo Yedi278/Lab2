@@ -3,8 +3,6 @@
 #include <iostream>
 #include <vector>
 
-#define PARTICLE_COUNT 10
-
 
 class Engine{
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "Vector.hpp"
 #include <SDL2/SDL.h>
+#include "Draw.hpp"
 
 class Particle
 {
@@ -13,7 +14,7 @@ public:
 
     float mass = 1;
     float q = 1;
-    float radius = 1;
+    float radius = 20;
 
     Particle();
     Particle(Vector* pos, Vector* vel, Vector* acc, float mass, float radius, float q);

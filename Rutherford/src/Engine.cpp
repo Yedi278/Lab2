@@ -54,7 +54,7 @@ int Engine::init(){
 void Engine::addParticle(){
     // Run the engine
     Particle* p = new Particle();
-    p->pos = Vector(400, 300);
+    p->pos = new Vector(400, 300);
     particles.emplace_back(p);
 
 }
@@ -72,6 +72,7 @@ void Engine::render(){
         part->render(renderer);
     }
     
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderPresent(renderer);
 }
 
