@@ -1,4 +1,6 @@
 #include "Engine.hpp"
+#include <iostream>
+
 #define WIDTH 800
 #define HEIGHT 600
 
@@ -16,13 +18,13 @@ Engine::Engine(){
             break;
     }
     
+    
+
 }
 
 Engine::~Engine(){
-    // Destructor
-    // free( renderer);
-    // free( window);
-    // delete this;
+    clean();
+    shutdown();
 }
 
 int Engine::init(){
@@ -50,19 +52,26 @@ int Engine::init(){
 
 void Engine::addElectron(){
     // Run the engine
-    Particle* p = new Particle();
-    p->pos = new Vector(10, rand() % HEIGHT);
-    electrons.emplace_back(p);
+    Particle* p = new Particle(new Vector(10,rand()%HEIGHT),new Vector(0,0),new Vector(0,0), 1, 5, -1);
+    electrons.push_back(p);
 
 }
 
-void Engine::update(){
-    // Update the engine
-
+void Engine::clean(){
+    // Clean the engine particles
     for (auto part : electrons){
-        // Vector dst = proton->pos;
-        std::cout << part << '\t' << (*part->pos - *proton->pos).x << std::endl;
-        // std::cout << (*proton->pos - *part->pos).mod() << std::endl;
+        delete part;
+    }
+    electrons.clear();
+}
+
+
+
+void Engine::update(){
+    // Update the engine physics
+
+    for (Particle part : electrons){
+        
     }
 
 }
@@ -76,7 +85,7 @@ void Engine::render(){
         part->render(renderer);
     }
 
-    proton->render(renderer, RED);
+    // proton.render(renderer, RED);
 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderPresent(renderer);

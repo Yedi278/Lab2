@@ -1,16 +1,16 @@
 #pragma once
-#include "Vector.hpp"
 #include <SDL2/SDL.h>
+#include <memory>
+#include "Vector.hpp"
 #include "Draw.hpp"
 
 class Particle
 {
-
 public:
 
-    Vector* pos = nullptr;
-    Vector* vel = nullptr;
-    Vector* acc = nullptr;
+    Vector* pos = new Vector(0,0);
+    Vector* vel = new Vector(0,0);
+    Vector* acc = new Vector(0,0);
 
     float mass = 1;
     float q = -1;

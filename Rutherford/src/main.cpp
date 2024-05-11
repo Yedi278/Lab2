@@ -1,4 +1,7 @@
 #include <iostream>
+#include <vector>
+#include <memory>
+
 #include <SDL2/SDL.h>
 #include "Engine.hpp"
 #include "Vector.hpp"
@@ -10,10 +13,13 @@ Uint32 a;
 
 int main() {
 
+    srand(time(0));
+
     Engine* eng = new Engine();
 
     a = SDL_GetTicks();
     
+
     eng->addElectron();
     eng->addElectron();
     eng->addElectron();
@@ -35,7 +41,7 @@ int main() {
         // std::cout << "FPS: " << 1000./float(SDL_GetTicks() - a) << '\n'; #print the FPS
         a = SDL_GetTicks();
     }
-    eng->shutdown();
 
+    delete eng;
     return 0;
 }

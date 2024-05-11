@@ -11,7 +11,7 @@ Vector::Vector(float x, float y){
 }
 
 Vector::~Vector(){
-    delete this;
+    
 }
 
 void Vector::operator=(Vector v){

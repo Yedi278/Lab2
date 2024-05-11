@@ -1,8 +1,9 @@
 #include <SDL2/SDL.h>
 #include "Particle.hpp"
-#include <iostream>
+#include "Vector.hpp"
 #include <vector>
-
+#include <memory>
+#include <iostream>
 
 class Engine{
 
@@ -19,12 +20,12 @@ public:
     void render();
     void update();
     void shutdown();
-
+    void clean();
     void addElectron();
 
 
     std::vector<Particle*> electrons;
-    Particle* proton = new Particle(new Vector(0,0), new Vector(0, 0), new Vector(0, 0), 1000, 40, 4);
+    // Particle proton;
 
 private:
 
