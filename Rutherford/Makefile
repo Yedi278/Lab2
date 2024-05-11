@@ -18,7 +18,7 @@ default:
 	@echo "Header files :"$(HEADS)
 	@echo "Library files: "$(LIB) "Include files: "$(INCLUDE) "libs: "$(libs)
 
-	$(CC) $(CFLAGS) $(SRC) $(libs) -o build/Build
+	@$(CC) $(CFLAGS) $(SRC) $(libs) -o build/Build
 
 run:
 	@echo "Running the program..."
