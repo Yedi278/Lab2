@@ -1,5 +1,4 @@
 #include "Engine.hpp"
-#include <iostream>
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -17,14 +16,22 @@ Engine::Engine(){
             running = false;
             break;
     }
-    
-    
 
-}
-
-Engine::~Engine(){
-    clean();
-    shutdown();
+    // Create the proton
+    try{
+        proton = new Particle();
+        if(proton == nullptr){
+            throw "Error creating proton";
+        }else{
+            proton->pos->x = WIDTH - 20;
+            proton->pos->y = HEIGHT/2;
+            proton->q = 1;
+            proton->radius = 10;
+        }
+    }
+    catch(const char* msg){
+        std::cerr << msg << std::endl;
+    }
 }
 
 int Engine::init(){
@@ -52,26 +59,47 @@ int Engine::init(){
 
 void Engine::addElectron(){
     // Run the engine
-    Particle* p = new Particle(new Vector(10,rand()%HEIGHT),new Vector(0,0),new Vector(0,0), 1, 5, -1);
-    electrons.push_back(p);
+    Particle* p = new Particle();
+    p->pos->x = 10;
+    p->pos->y = rand() % HEIGHT;
+    electrons.emplace_back(p);
 
 }
 
-void Engine::clean(){
-    // Clean the engine particles
-    for (auto part : electrons){
-        delete part;
-    }
-    electrons.clear();
+Vector* F_coulomb(Particle* p1, Particle* p2){
+    // Coulomb force on p1 due to p2
+    
+    float k = (float)1e5;
+    Vector r = *p2->pos - *p1->pos;
+    
+    float F = k * p1->q * p2->q / (r.mod()*r.mod());
+    
+    // std::cout << "F: " << F << std::endl;
+    Vector* F_vec = new Vector();
+    F_vec->mod(F);
+    F_vec->ang(r.ang(false));
+    return F_vec;
+}
+
+void Verlet(Particle* p, float dt){
+    // Verlet integration
+    *p->pos += *p->vel + *p->acc * 0.5 * dt*dt;
+    *p->vel += *p->acc * dt;
 }
 
 
-
-void Engine::update(){
+void Engine::update(float dt){
     // Update the engine physics
+    for (auto part : electrons){
 
-    for (Particle part : electrons){
-        
+        // Update the electron
+        Vector* F = F_coulomb(part, proton);
+        delete F;
+        delete part->acc;
+        part->acc = F;
+        // std::cout << "F: " << F->x << ", " << F->y << std::endl;
+        Verlet(part, dt);
+
     }
 
 }
@@ -80,21 +108,19 @@ void Engine::render(){
     // Render the engine
     SDL_RenderClear(renderer);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
+    
+    Vector* v;
     for (auto part : electrons){
         part->render(renderer);
+        v = F_coulomb(part, proton);
+        SDL_RenderDrawArrow(renderer, *part->pos, *v, 1);
     }
+    delete v;
 
-    // proton.render(renderer, RED);
+    proton->render(renderer, RED);
 
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderPresent(renderer);
-}
-
-void Engine::shutdown(){
-    // Shutdown the engine
-    std::cout << "Shutting down the engine" << std::endl;   
-    SDL_Quit();
 }
 
 void Engine::handleEvents(){
@@ -111,4 +137,23 @@ void Engine::handleEvents(){
     default:
         break;
     }
+}
+
+void Engine::shutdown(){
+    // Shutdown the engine
+    std::cout << "Shutting down the engine" << std::endl;   
+    SDL_Quit();
+}
+
+void Engine::clean(){
+    // Clean the engine particles
+    for (auto part : electrons){
+        delete part;
+    }
+    electrons.clear();
+}
+
+Engine::~Engine(){
+    clean();
+    shutdown();
 }

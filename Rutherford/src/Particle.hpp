@@ -8,9 +8,9 @@ class Particle
 {
 public:
 
-    Vector* pos = new Vector(0,0);
-    Vector* vel = new Vector(0,0);
-    Vector* acc = new Vector(0,0);
+    Vector* pos = nullptr;
+    Vector* vel = nullptr;
+    Vector* acc = nullptr;
 
     float mass = 1;
     float q = -1;

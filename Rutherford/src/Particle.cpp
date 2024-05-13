@@ -2,6 +2,10 @@
 
 Particle::Particle()
 {   
+    pos = new Vector(0,0);
+    vel = new Vector(0,0);
+    acc = new Vector(0,0);
+
     if(pos == nullptr){
         SDL_Log("pos is nullptr");
     }

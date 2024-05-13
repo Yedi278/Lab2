@@ -24,5 +24,8 @@ public:
     Vector operator*(float s);
     Vector operator/(float s);
 
+    Vector operator+=(Vector v);
+    Vector operator-=(Vector v);
+
     ~Vector();
 };

@@ -1,13 +1,12 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-
 #include <SDL2/SDL.h>
 #include "Engine.hpp"
 #include "Vector.hpp"
-#undef main
-#define FPS 60
 
+#undef main
+#define FPS 30
 
 Uint32 a;
 
@@ -19,7 +18,6 @@ int main() {
 
     a = SDL_GetTicks();
     
-
     eng->addElectron();
     eng->addElectron();
     eng->addElectron();
@@ -36,7 +34,7 @@ int main() {
         }
 
         eng->render();
-        eng->update();
+        eng->update((float)(SDL_GetTicks() - a)/1000.0);
 
         // std::cout << "FPS: " << 1000./float(SDL_GetTicks() - a) << '\n'; #print the FPS
         a = SDL_GetTicks();

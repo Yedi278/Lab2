@@ -63,3 +63,15 @@ void Vector::ang(float ang){
     this->x = m*cos(ang);
     this->y = m*sin(ang);
 }
+
+Vector Vector::operator+=(Vector v){
+    x += v.x;
+    y += v.y;
+    return *this;
+}
+
+Vector Vector::operator-=(Vector v){
+    x -= v.x;
+    y -= v.y;
+    return *this;
+}

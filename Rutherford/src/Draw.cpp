@@ -1,20 +1,18 @@
 #include "Draw.hpp"
 
-// void SDL_RenderDrawArrow(SDL_Renderer* renderer, Vector center, Vector v, float alpha){
+void SDL_RenderDrawArrow(SDL_Renderer* renderer, Vector center, Vector v, float alpha){
 
-//     Vector sum = (v*alpha)+center;
+    Vector sum = (v*alpha)+center;
 
-//     SDL_RenderDrawLine(renderer, center.x, center.y, sum.x, sum.y);
+    SDL_RenderDrawLine(renderer, center.x, center.y, sum.x, sum.y);
     
-//     Vector side = v*0.5;
+    Vector side = v*0.5;
 
-//     side.ang(v.ang()-M_PI_2 -M_PI_4);
-//     SDL_RenderDrawLine(renderer, sum.x, sum.y, sum.x+side.x, sum.y+side.y);
-//     side.ang(v.ang()+M_PI_2+M_PI_4);
-//     SDL_RenderDrawLine(renderer, sum.x, sum.y, sum.x+side.x, sum.y+side.y);
-
-
-// }
+    side.ang((float)(v.ang(false)-M_PI_2 -M_PI_4));
+    SDL_RenderDrawLine(renderer, sum.x, sum.y, sum.x+side.x, sum.y+side.y);
+    side.ang((float)(v.ang(false)+M_PI_2 +M_PI_4));
+    SDL_RenderDrawLine(renderer, sum.x, sum.y, sum.x+side.x, sum.y+side.y);
+}
 
 int SDL_RenderDrawCircle(SDL_Renderer * renderer, int x, int y, int radius)
 {
