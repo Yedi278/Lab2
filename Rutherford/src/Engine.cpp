@@ -1,6 +1,6 @@
 #include "Engine.hpp"
 
-#define WIDTH 800
+#define WIDTH 1000
 #define HEIGHT 600
 
 Engine::Engine(){
@@ -24,7 +24,7 @@ Engine::Engine(){
             throw "Error creating proton";
         }else{
             proton->pos->x = 500;
-            proton->pos->y = HEIGHT/2;
+            proton->pos->y = 580;
             proton->q = 2;
             proton->radius = 10;
         }
@@ -166,6 +166,12 @@ void Engine::handleEvents(){
         {
         case SDLK_SPACE:
             paused = !paused;
+            if(paused){
+                std::cout << "Simulation paused" << std::endl;
+            }
+            else{
+                std::cout << "Simulation resumed" << std::endl;
+            }
             break;
         
         default:

@@ -19,28 +19,30 @@ int main() {
 
     float V_o = 6;
 
-    eng.addElectron(200,V_o);
-    eng.addElectron(240,V_o);
-    eng.addElectron(250,V_o);
     eng.addElectron(300,V_o);
+    eng.addElectron(440,V_o);
+    eng.addElectron(550,V_o);
+    eng.addElectron(500,V_o);
 
     a = SDL_GetTicks();
     
     while (eng.running == true){
         
+        eng.handleEvents();
 
-        while(SDL_GetTicks() - a < 1000/FPS){
+        if(!eng.paused){
             
-            eng.handleEvents();
+            while(SDL_GetTicks() - a < 1000/FPS){
+                
 
+            }
+
+            eng.render();
+            eng.update(0.01);
+
+            // std::cout << "FPS: " << 1000./float(SDL_GetTicks() - a) << '\n'; #print the FPS
+            a = SDL_GetTicks();
         }
-
-        eng.render();
-        eng.update(0.01);
-
-        // std::cout << "FPS: " << 1000./float(SDL_GetTicks() - a) << '\n'; #print the FPS
-        a = SDL_GetTicks();
-
     }
 
     return 0;
