@@ -1,7 +1,8 @@
+#include <SDL.h>
 #include <iostream>
 #include <vector>
 #include <memory>
-#include <SDL2/SDL.h>
+#include <time.h>
 #include "Engine.hpp"
 #include "Vector.hpp"
 
@@ -16,9 +17,12 @@ int main() {
 
     Engine eng;
 
-    eng.addElectron(200,6);
-    eng.addElectron(220,6);
-    eng.addElectron(240,6);
+    float V_o = 6;
+
+    eng.addElectron(200,V_o);
+    eng.addElectron(240,V_o);
+    eng.addElectron(250,V_o);
+    eng.addElectron(300,V_o);
 
     a = SDL_GetTicks();
     
@@ -32,10 +36,11 @@ int main() {
         }
 
         eng.render();
-        eng.update((float)(SDL_GetTicks() - a)/1000.0);
+        eng.update(0.01);
 
         // std::cout << "FPS: " << 1000./float(SDL_GetTicks() - a) << '\n'; #print the FPS
         a = SDL_GetTicks();
+
     }
 
     return 0;

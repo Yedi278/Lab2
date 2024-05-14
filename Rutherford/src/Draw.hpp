@@ -1,5 +1,5 @@
 #pragma once
-#include "SDL2/SDL.h"
+#include "SDL.h"
 #include "Vector.hpp"
 
 #define RED 255, 0, 0, 255

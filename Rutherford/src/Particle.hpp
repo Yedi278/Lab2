@@ -1,8 +1,14 @@
 #pragma once
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <memory>
+#include <vector>
 #include "Vector.hpp"
 #include "Draw.hpp"
+
+struct trace{
+    float x;
+    float y;
+};
 
 class Particle
 {
@@ -15,6 +21,8 @@ public:
     float mass = 1;
     float q = -1;
     float radius = 5;
+
+    std::vector<trace> traces;
 
     Particle();
     Particle(Vector* pos, Vector* vel, Vector* acc, float mass, float radius, float q);

@@ -11,7 +11,6 @@ libs = -L$(LIB) -I$(INCLUDE) -lSDL2main  -lSDL2
 
 default:
 
-	@echo $(libs)
 	@echo "Compiling the source files..."
 	@echo "Source files: "$(SRC)
 	@echo "Header files :"$(HEADS)
@@ -22,3 +21,5 @@ default:
 run:
 	@echo "Running the program..."
 	@./build/Build
+
+all: default run

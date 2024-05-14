@@ -1,4 +1,4 @@
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -10,6 +10,7 @@ class Engine{
 public:
 
     bool running = false;
+    bool paused = false;
     const char* title = "Rutherford Scattering Simulation";
 
     Engine();

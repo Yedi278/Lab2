@@ -25,7 +25,7 @@ Engine::Engine(){
         }else{
             proton->pos->x = 500;
             proton->pos->y = HEIGHT/2;
-            proton->q = 1;
+            proton->q = 2;
             proton->radius = 10;
         }
     }
@@ -93,34 +93,60 @@ void Engine::update(float dt){
     // Update the engine physics
     for (auto part : electrons){
 
-        // Update the electron
+        // Calculate the Coulomb force on the particle
         Vector* F = F_coulomb(part, proton);
         
-        // delete F;
+        // Update the particle's acceleration
         delete part->acc;
         part->acc = F;
-        // std::cout << "F: " << F->x << ", " << F->y << std::endl;
+        
+        // Perform Verlet integration to update the particle's position and velocity
         Verlet(part, dt);
+        part->traces.push_back({part->pos->x, part->pos->y});
     }
 
 }
 
+void printTraces(SDL_Renderer* renderer, std::vector<trace> traces){
+    // Print the traces of the particles
+    for (auto t : traces){
+        SDL_RenderDrawPoint(renderer, t.x, t.y);
+    }
+}  
+
 void Engine::render(){
     // Render the engine
-    SDL_RenderClear(renderer);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     
+    // Clear the renderer
+    SDL_RenderClear(renderer);
+    
+    // Set the draw color to black
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    
+    // Render the electrons and their Coulomb force vectors
     Vector* v;
     for (auto part : electrons){
         part->render(renderer);
         v = F_coulomb(part, proton);
         SDL_RenderDrawArrow(renderer, *part->pos, *v, 1);
+
+        SDL_SetRenderDrawColor(renderer, RED);
+        SDL_RenderDrawArrow(renderer, *part->pos, *part->vel, 10);
+
+
+        SDL_SetRenderDrawColor(renderer, WHITE);
+        printTraces(renderer, part->traces);
+        
     }
     delete v;
 
+    // Render the proton
     proton->render(renderer, RED);
 
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    // Set the draw color back to black
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    
+    // Present the renderer
     SDL_RenderPresent(renderer);
 }
 
@@ -134,7 +160,17 @@ void Engine::handleEvents(){
         this->running = false;
         SDL_Log("Quit event detected, setting 'running' to false\n");
         break;
-    
+
+    case SDL_KEYDOWN:
+        switch (event.key.keysym.sym)
+        {
+        case SDLK_SPACE:
+            paused = !paused;
+            break;
+        
+        default:
+            break;
+        }
     default:
         break;
     }
