@@ -22,7 +22,7 @@ public:
     void update(float dt);
     void shutdown();
     void clean();
-    void addElectron();
+    void addElectron(float y, float vo);
 
     std::vector<Particle*> electrons;
     Particle* proton = nullptr;

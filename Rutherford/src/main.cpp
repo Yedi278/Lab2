@@ -16,9 +16,9 @@ int main() {
 
     Engine eng;
 
-    eng.addElectron();
-    eng.addElectron();
-    eng.addElectron();
+    eng.addElectron(200,12);
+    eng.addElectron(220,12);
+    eng.addElectron(240,12);
 
     a = SDL_GetTicks();
       

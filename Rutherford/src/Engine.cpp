@@ -23,7 +23,7 @@ Engine::Engine(){
         if(proton == nullptr){
             throw "Error creating proton";
         }else{
-            proton->pos->x = 600;
+            proton->pos->x = 500;
             proton->pos->y = HEIGHT/2;
             proton->q = 1;
             proton->radius = 10;
@@ -57,12 +57,12 @@ int Engine::init(){
     return 1;
 }
 
-void Engine::addElectron(float y){
+void Engine::addElectron(float y, float vo){
     // Run the engine
     Particle* p = new Particle();
     p->pos->x = 10;
     p->pos->y = y;
-    p->vel->x = 5;
+    p->vel->x = vo;
     electrons.emplace_back(p);
 
 }
