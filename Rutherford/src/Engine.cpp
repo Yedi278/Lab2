@@ -23,7 +23,7 @@ Engine::Engine(){
         if(proton == nullptr){
             throw "Error creating proton";
         }else{
-            proton->pos->x = WIDTH - 20;
+            proton->pos->x = 600;
             proton->pos->y = HEIGHT/2;
             proton->q = 1;
             proton->radius = 10;
@@ -57,11 +57,12 @@ int Engine::init(){
     return 1;
 }
 
-void Engine::addElectron(){
+void Engine::addElectron(float y){
     // Run the engine
     Particle* p = new Particle();
     p->pos->x = 10;
-    p->pos->y = rand() % HEIGHT;
+    p->pos->y = y;
+    p->vel->x = 5;
     electrons.emplace_back(p);
 
 }
@@ -70,7 +71,7 @@ Vector* F_coulomb(Particle* p1, Particle* p2){
     // Coulomb force on p1 due to p2
     
     float k = (float)1e5;
-    Vector r = *p2->pos - *p1->pos;
+    Vector r = *p1->pos - *p2->pos;
     
     float F = k * p1->q * p2->q / (r.mod()*r.mod());
     
@@ -94,12 +95,12 @@ void Engine::update(float dt){
 
         // Update the electron
         Vector* F = F_coulomb(part, proton);
-        delete F;
+        
+        // delete F;
         delete part->acc;
         part->acc = F;
         // std::cout << "F: " << F->x << ", " << F->y << std::endl;
         Verlet(part, dt);
-
     }
 
 }

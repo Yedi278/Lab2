@@ -14,32 +14,29 @@ int main() {
 
     srand(time(0));
 
-    Engine* eng = new Engine();
+    Engine eng;
+
+    eng.addElectron();
+    eng.addElectron();
+    eng.addElectron();
 
     a = SDL_GetTicks();
-    
-    eng->addElectron();
-    eng->addElectron();
-    eng->addElectron();
-    eng->addElectron();
-
-    
-    while (eng->running == true){
+      
+    while (eng.running == true){
         
 
         while(SDL_GetTicks() - a < 1000/FPS){
             
-            eng->handleEvents();
+            eng.handleEvents();
 
         }
 
-        eng->render();
-        eng->update((float)(SDL_GetTicks() - a)/1000.0);
+        eng.render();
+        eng.update((float)(SDL_GetTicks() - a)/1000.0);
 
         // std::cout << "FPS: " << 1000./float(SDL_GetTicks() - a) << '\n'; #print the FPS
         a = SDL_GetTicks();
     }
 
-    delete eng;
     return 0;
 }
