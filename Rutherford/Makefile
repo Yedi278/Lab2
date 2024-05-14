@@ -11,16 +11,18 @@ libs = -L$(LIB) -I$(INCLUDE) -lSDL2main  -lSDL2
 
 default:
 
+	
 	@echo -n "Compiling the source files..."
 	@echo "Source files: "$(SRC)
 	@echo "Header files : "$(HEADS)
 	@echo "Library files: "$(LIB) "Include files: "$(INCLUDE) "libs: "$(libs)
 
 
-	@echo -e "\033[0;32m [OK] \033[0m       \033[0;33m Compiling:\033[0m" $<
 
 
 	@$(CC) $(CFLAGS) $(SRC) $(libs) -o build/Build
+
+	@echo -e "\033[0;32m [OK] \033[0m	\033[0;33m Compiled:\033[0m" $<
 
 run:
 	@echo "Running the program..."
