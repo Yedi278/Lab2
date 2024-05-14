@@ -17,27 +17,28 @@ int main() {
 
     Engine eng;
 
-    //Uncomment for Coulomb's law
-    // float vel_o_part = 4e2;
+
+    // Uncomment for Coulomb's law
+    float vel_o_part = 4e2;
 
     // eng.addElectron(460,vel_o_part);
     // eng.addElectron(470,vel_o_part);
     // eng.addElectron(480,vel_o_part);
 
-    // eng.addNucleum(600,100);
-    // eng.addNucleum(600,200);
-    // eng.addNucleum(600,300);
-    // eng.addNucleum(600,400);
-    // eng.addNucleum(600,500);
+    eng.addNucleum(600,100);
+    eng.addNucleum(600,200);
+    eng.addNucleum(600,300);
+    eng.addNucleum(600,400);
+    eng.addNucleum(600,500);
 
     //Uncomment for Gravity law
-    float vel_o_part = 6e2;
-    eng.addNucleum(600,300);
+    // float vel_o_part = 6e2;
+    // eng.addNucleum(600,300);
 
 
 
-    for(int i = 0; i < 200; i++){
-        eng.addElectron(200+i*2,vel_o_part);
+    for(int i = 0; i < 600; i++){
+        eng.addElectron(i,vel_o_part);
     }
 
 
@@ -58,7 +59,7 @@ int main() {
             eng.render();
             eng.update((float)1/(FPS));
 
-            // std::cout << "FPS: " << 1000./float(SDL_GetTicks() - a) << '\n'; #print the FPS
+            std::cout << "FPS: " << 1000./float(SDL_GetTicks() - a) << '\n';
             a = SDL_GetTicks();
         }
     }

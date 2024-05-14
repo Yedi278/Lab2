@@ -45,6 +45,7 @@ int Engine::init(){
 void Engine::addElectron(float y, float vo){
     // Run the engine
     Particle* p = new Particle();
+    p->q = 1;
     p->pos->x = 10;
     p->pos->y = y;
     p->vel->x = vo;
@@ -71,7 +72,7 @@ void Engine::update(float dt){
         Vector* F = new Vector(0,0);
 
         for(auto n : nucleus){
-            Vector* F_c = Gravity::Force(part, n);
+            Vector* F_c = Coulomb::Force(part, n);
             *F += *F_c;
             delete F_c;
         }
