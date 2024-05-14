@@ -3,6 +3,7 @@
 #define WIDTH 1000
 #define HEIGHT 600
 
+
 Engine::Engine(){
     // Constructor
     int val = init();   //control the initialization of the engine SDL parameters
@@ -15,22 +16,6 @@ Engine::Engine(){
         default:
             running = false;
             break;
-    }
-
-    // Create the proton
-    try{
-        proton = new Particle();
-        if(proton == nullptr){
-            throw "Error creating proton";
-        }else{
-            proton->pos->x = 500;
-            proton->pos->y = 580;
-            proton->q = 2;
-            proton->radius = 10;
-        }
-    }
-    catch(const char* msg){
-        std::cerr << msg << std::endl;
     }
 }
 
@@ -63,56 +48,44 @@ void Engine::addElectron(float y, float vo){
     p->pos->x = 10;
     p->pos->y = y;
     p->vel->x = vo;
+    p->radius = 3;
     electrons.emplace_back(p);
 
 }
 
-Vector* F_coulomb(Particle* p1, Particle* p2){
-    // Coulomb force on p1 due to p2
-    
-    float k = (float)1e5;
-    Vector r = *p1->pos - *p2->pos;
-    
-    float F = k * p1->q * p2->q / (r.mod()*r.mod());
-    
-    // std::cout << "F: " << F << std::endl;
-    Vector* F_vec = new Vector();
-    F_vec->mod(F);
-    F_vec->ang(r.ang(false));
-    return F_vec;
-}
+void Engine::addNucleum(float x, float y){
 
-void Verlet(Particle* p, float dt){
-    // Verlet integration
-    *p->pos += *p->vel + *p->acc * 0.5 * dt*dt;
-    *p->vel += *p->acc * dt;
-}
+    Particle* p = new Particle();
+    p->pos->x = x;
+    p->pos->y = y;
+    p->q = 1;
+    p->radius = 7;
+    nucleus.emplace_back(p);
 
+}
 
 void Engine::update(float dt){
     // Update the engine physics
     for (auto part : electrons){
 
-        // Calculate the Coulomb force on the particle
-        Vector* F = F_coulomb(part, proton);
-        
+        Vector* F = new Vector(0,0);
+
+        for(auto n : nucleus){
+            Vector* F_c = Gravity::Force(part, n);
+            *F += *F_c;
+            delete F_c;
+        }
+
         // Update the particle's acceleration
         delete part->acc;
         part->acc = F;
         
         // Perform Verlet integration to update the particle's position and velocity
-        Verlet(part, dt);
+        Verlet::Integrator(part, dt);
         part->traces.push_back({part->pos->x, part->pos->y});
     }
-
 }
-
-void printTraces(SDL_Renderer* renderer, std::vector<trace> traces){
-    // Print the traces of the particles
-    for (auto t : traces){
-        SDL_RenderDrawPoint(renderer, t.x, t.y);
-    }
-}  
+ 
 
 void Engine::render(){
     // Render the engine
@@ -124,24 +97,25 @@ void Engine::render(){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     
     // Render the electrons and their Coulomb force vectors
-    Vector* v;
     for (auto part : electrons){
         part->render(renderer);
-        v = F_coulomb(part, proton);
-        SDL_RenderDrawArrow(renderer, *part->pos, *v, 1);
 
         SDL_SetRenderDrawColor(renderer, RED);
-        SDL_RenderDrawArrow(renderer, *part->pos, *part->vel, 10);
-
+        SDL_RenderDrawArrow(renderer, *part->pos, *part->vel, .1);
 
         SDL_SetRenderDrawColor(renderer, WHITE);
-        printTraces(renderer, part->traces);
+
+        if(show_trace){
+            for (auto t : part->traces){
+                SDL_RenderDrawPoint(renderer, t.x, t.y);
+            }
+        }
         
     }
-    delete v;
 
-    // Render the proton
-    proton->render(renderer, RED);
+    for(auto part : nucleus){
+        part->render(renderer, RED);
+    }
 
     // Set the draw color back to black
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -164,6 +138,7 @@ void Engine::handleEvents(){
     case SDL_KEYDOWN:
         switch (event.key.keysym.sym)
         {
+        
         case SDLK_SPACE:
             paused = !paused;
             if(paused){
@@ -171,6 +146,16 @@ void Engine::handleEvents(){
             }
             else{
                 std::cout << "Simulation resumed" << std::endl;
+            }
+            break;
+        
+        case SDLK_t:
+            show_trace = !show_trace;
+            if(show_trace){
+                std::cout << "Traces enabled" << std::endl;
+            }
+            else{
+                std::cout << "Traces disabled" << std::endl;
             }
             break;
         
@@ -193,7 +178,11 @@ void Engine::clean(){
     for (auto part : electrons){
         delete part;
     }
+    for (auto part : nucleus){
+        delete part;
+    }
     electrons.clear();
+    nucleus.clear();
 }
 
 Engine::~Engine(){

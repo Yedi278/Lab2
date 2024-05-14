@@ -7,7 +7,7 @@
 #include "Vector.hpp"
 
 #undef main
-#define FPS 60
+#define FPS 120
 
 Uint32 a;
 
@@ -17,12 +17,29 @@ int main() {
 
     Engine eng;
 
-    float V_o = 6;
+    //Uncomment for Coulomb's law
+    // float vel_o_part = 4e2;
 
-    eng.addElectron(300,V_o);
-    eng.addElectron(440,V_o);
-    eng.addElectron(550,V_o);
-    eng.addElectron(500,V_o);
+    // eng.addElectron(460,vel_o_part);
+    // eng.addElectron(470,vel_o_part);
+    // eng.addElectron(480,vel_o_part);
+
+    // eng.addNucleum(600,100);
+    // eng.addNucleum(600,200);
+    // eng.addNucleum(600,300);
+    // eng.addNucleum(600,400);
+    // eng.addNucleum(600,500);
+
+    //Uncomment for Gravity law
+    float vel_o_part = 6e2;
+    eng.addNucleum(600,300);
+
+
+
+    for(int i = 0; i < 200; i++){
+        eng.addElectron(200+i*2,vel_o_part);
+    }
+
 
     a = SDL_GetTicks();
     
@@ -39,7 +56,7 @@ int main() {
             }
 
             eng.render();
-            eng.update(0.01);
+            eng.update((float)1/(FPS));
 
             // std::cout << "FPS: " << 1000./float(SDL_GetTicks() - a) << '\n'; #print the FPS
             a = SDL_GetTicks();

@@ -8,11 +8,12 @@ void SDL_RenderDrawArrow(SDL_Renderer* renderer, Vector center, Vector v, float 
 
     SDL_RenderDrawLine(renderer, center.x, center.y, sum.x, sum.y);
     
-    Vector side = v*0.5;
+    Vector side = v*0.3;
 
-    side.ang((float)(v.ang(false)-M_PI_2 -M_PI_4));
+    side.mod(side.mod()*alpha);
+    side.ang((float)(v.ang(false)-M_PI_2 -(3*M_PI_4/2)));
     SDL_RenderDrawLine(renderer, sum.x, sum.y, sum.x+side.x, sum.y+side.y);
-    side.ang((float)(v.ang(false)+M_PI_2 +M_PI_4));
+    side.ang((float)(v.ang(false)+M_PI_2 +(3*M_PI_4/2)));
     SDL_RenderDrawLine(renderer, sum.x, sum.y, sum.x+side.x, sum.y+side.y);
 }
 
@@ -102,22 +103,3 @@ int SDL_RenderFillCircle(SDL_Renderer * renderer, int x, int y, int radius)
 
     return status;
 }
-
-// void SDL_RenderDrawGrid(SDL_Renderer* renderer, SDL_Window* window, int w_size, int h_size){
-
-//     //get window size
-//     int width, height;
-//     SDL_GetWindowSize(window, &width, &height);
-
-//     int w = width/w_size;
-//     int h = height/h_size;
-
-
-//     for(int i=0; i<w_size; i++){
-//         SDL_RenderDrawLine(renderer, i*w, 0, i*w, height);
-//     }
-//     for(int i=0; i<h_size; i++){
-//         SDL_RenderDrawLine(renderer, 0, i*h, width, i*h);
-//     }
-
-// }

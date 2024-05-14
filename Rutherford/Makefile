@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -std=c++14 -g
+CFLAGS = -Wall -std=c++17 -g
 
 SRC = $(wildcard src/*.cpp)
 HEADS = $(wildcard src/*.hpp)

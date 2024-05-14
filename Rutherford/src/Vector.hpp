@@ -19,9 +19,13 @@ public:
     void ang(float ang);
 
     void operator=(Vector v);
+    
     Vector operator+(Vector v);
     Vector operator-(Vector v);
+    
     Vector operator*(float s);
+    // Vector operator*(int s);
+
     Vector operator/(float s);
 
     Vector operator+=(Vector v);

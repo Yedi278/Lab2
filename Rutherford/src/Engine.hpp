@@ -2,6 +2,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include "Physics.hpp"
 #include "Particle.hpp"
 #include "Vector.hpp"
 
@@ -10,7 +11,8 @@ class Engine{
 public:
 
     bool running = false;
-    bool paused = false;
+    bool paused = true;
+    bool show_trace = true;
     const char* title = "Rutherford Scattering Simulation";
 
     Engine();
@@ -24,9 +26,10 @@ public:
     void shutdown();
     void clean();
     void addElectron(float y, float vo);
+    void addNucleum(float x,float y);
 
     std::vector<Particle*> electrons;
-    Particle* proton = nullptr;
+    std::vector<Particle*> nucleus;
 
 private:
 

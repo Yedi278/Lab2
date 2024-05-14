@@ -19,7 +19,7 @@ public:
     Vector* acc = nullptr;
 
     float mass = 1;
-    float q = -1;
+    float q = 1;
     float radius = 5;
 
     std::vector<trace> traces;
