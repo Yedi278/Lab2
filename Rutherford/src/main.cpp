@@ -6,7 +6,7 @@
 #include "Vector.hpp"
 
 #undef main
-#define FPS 30
+#define FPS 60
 
 Uint32 a;
 
@@ -16,12 +16,12 @@ int main() {
 
     Engine eng;
 
-    eng.addElectron(200,12);
-    eng.addElectron(220,12);
-    eng.addElectron(240,12);
+    eng.addElectron(200,6);
+    eng.addElectron(220,6);
+    eng.addElectron(240,6);
 
     a = SDL_GetTicks();
-      
+    
     while (eng.running == true){
         
 
