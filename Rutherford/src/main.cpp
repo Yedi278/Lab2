@@ -30,6 +30,7 @@ int main() {
         
         eng.handleEvents();
 
+
         if(!eng.paused){
             
             while(SDL_GetTicks() - a < 1000/FPS){
