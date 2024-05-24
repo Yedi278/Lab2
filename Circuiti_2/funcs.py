@@ -45,9 +45,9 @@ def get_data(path:str):
         if name != None:
             third_channel = pd.read_csv(path+name).iloc[:,3].to_numpy(np.float128) , pd.read_csv(path+name).iloc[:,4].to_numpy(np.float128)
         else:
-            third_channel = first_channel[0], np.zeros(first_channel[0].shape)
+            third_channel = first_channel[0], None
     except:
-        third_channel = first_channel[0], np.zeros(first_channel[0].shape)
+        third_channel = first_channel[0], None
         print('Error loading third channel')
     
 
