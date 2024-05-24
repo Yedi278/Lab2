@@ -95,7 +95,7 @@ def valuta_errori(formula_errori:str, values:dict, errors:dict, x:dict=None):
   return expr
 
 # @title media pesata
-def media_pesata(x,err) -> tuple['media','sigma']:
+def media_pesata(x,err) -> tuple['media':str,'sigma':str]:
 
   x_ = np.array(x)
   err_ = np.array(err)
