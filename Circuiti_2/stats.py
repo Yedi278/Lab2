@@ -1,5 +1,6 @@
 import numpy as np
-import scipy as sc
+from scipy.stats import norm
+import scipy
 import matplotlib.pyplot as plt
 import sympy
 
@@ -16,17 +17,17 @@ def chi_test(fval, ndof, x_limit = 40):
   '''
 
   x = np.linspace(0,x_limit, 1000)
-  y = [sc.stats.chi2.pdf(i,df=ndof) for i in x]
+  y = [scipy.stats.chi2.pdf(i,df=ndof) for i in x]
 
   section = np.arange(fval, x_limit)
-  plt.fill_between(section,sc.stats.chi2.pdf(section,df=ndof), alpha=.4)
+  plt.fill_between(section,scipy.stats.chi2.pdf(section,df=ndof), alpha=.4)
   plt.title('Test $\chi^2$')
   plt.xlabel(r'$\chi^2$')
   plt.ylabel('$pdf(\chi^2)$')
-  plt.legend([r'$\tilde\chi^2$ '+f'= {round(fval/ndof,2)} \n p-value = {round(1 - sc.stats.chi2.cdf(fval,ndof),3)*100}%'])
+  plt.legend([r'$\tilde\chi^2$ '+f'= {round(fval/ndof,2)} \n p-value = {round(1 - scipy.stats.chi2.cdf(fval,ndof),3)*100}%'])
   plt.plot(x,y)
 
-  return (1 - sc.stats.chi2.cdf(fval,ndof))
+  return (1 - scipy.stats.chi2.cdf(fval,ndof))
 
 def t_test(tvalue, df,xlim = 7, alpha = 0.05 ):
   '''This function visualizes the t Student test for a given t value and degrees of freedom
@@ -39,7 +40,7 @@ def t_test(tvalue, df,xlim = 7, alpha = 0.05 ):
   '''
 
   x = np.linspace(-xlim,xlim,2000)
-  y = [ sc.stats.t.pdf(i,df) for i in x]
+  y = [ scipy.stats.t.pdf(i,df) for i in x]
 
   section1 = np.linspace(-xlim,-tvalue)
   plt.fill_between(section1,sc.stats.t.pdf(section1,df=df), alpha=.4, color='b')
@@ -50,9 +51,9 @@ def t_test(tvalue, df,xlim = 7, alpha = 0.05 ):
   # plt.title('t Test')
   plt.xlabel(r't')
   plt.ylabel('pdf(t)')
-  plt.legend([r'$\alpha$'+f' = {round((1-sc.stats.t.cdf(tvalue,df=df))*2, 4)}'])
+  plt.legend([r'$\alpha$'+f' = {round((1-scipy.stats.t.cdf(tvalue,df=df))*2, 4)}'])
   plt.plot(x,y)
-  return (1-sc.stats.t.cdf(tvalue,df=df))*2
+  return (1-scipy.stats.t.cdf(tvalue,df=df))*2
 
 
 #@title Error Propagation no Covariance
@@ -114,3 +115,6 @@ def media_pesata(x,err) -> tuple['media':str,'sigma':str]:
   sigma = np.sqrt(float(1/s2))
 
   return media,sigma
+
+def normal(x:float, mu:float, sigma:float) -> float:
+  return norm.pdf(x, mu, sigma)
