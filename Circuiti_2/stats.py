@@ -118,3 +118,15 @@ def media_pesata(x,err) -> tuple['media':str,'sigma':str]:
 
 def normal(x:float, mu:float, sigma:float) -> float:
   return norm.pdf(x, mu, sigma)
+
+def normal_cdf(x:float, mu:float, sigma:float) -> float:
+  return norm.cdf(x, mu, sigma)
+
+def sturges_rule(data):
+    return int(np.ceil(np.log2(len(data)) + 1))
+
+def normal_scaled(x:float, mu:float, sigma:float, scale:float) -> float:
+  return scale*norm.pdf(x, mu, sigma)
+
+def normal_scaled_cdf(x:float, mu:float, sigma:float, scale:float) -> float:
+  return scale*norm.cdf(x, mu, sigma)
