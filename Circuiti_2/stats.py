@@ -43,10 +43,10 @@ def t_test(tvalue, df,xlim = 7, alpha = 0.05 ):
   y = [ scipy.stats.t.pdf(i,df) for i in x]
 
   section1 = np.linspace(-xlim,-tvalue)
-  plt.fill_between(section1,sc.stats.t.pdf(section1,df=df), alpha=.4, color='b')
+  plt.fill_between(section1,scipy.stats.t.pdf(section1,df=df), alpha=.4, color='b')
 
   section2 = np.linspace(tvalue, xlim)
-  plt.fill_between(section2,sc.stats.t.pdf(section2,df=df), alpha=.4, color='b')
+  plt.fill_between(section2,scipy.stats.t.pdf(section2,df=df), alpha=.4, color='b')
 
   # plt.title('t Test')
   plt.xlabel(r't')
