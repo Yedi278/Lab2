@@ -24,7 +24,7 @@ def chi_test(fval, ndof, x_limit = 40):
   plt.title('Test $\chi^2$')
   plt.xlabel(r'$\chi^2$')
   plt.ylabel('$pdf(\chi^2)$')
-  plt.legend([r'$\tilde\chi^2$ '+f'= {round(fval/ndof,2)} \n p-value = {round(1 - scipy.stats.chi2.cdf(fval,ndof),3)*100}%'])
+  plt.legend([r'$\chi^2$ '+f'= {round(fval,2)}\n'+f'$dof = {round(ndof,2)}$ \n'+f'p-value = {round(1 - scipy.stats.chi2.cdf(fval,ndof),3)*100}%'])
   plt.plot(x,y)
 
   return (1 - scipy.stats.chi2.cdf(fval,ndof))
