@@ -8,7 +8,7 @@ cliccare il [link](https://www.desmos.com/calculator/ojucszdzsd)
 cliccare il [link](https://www.desmos.com/calculator/zh1dcimqsx)
 
 ### Simulazione Circuito RLC
-cliccare il [link]()
+cliccare il [link](https://www.desmos.com/calculator/r9d9sdibmk)
 
 ## Prese dati
 

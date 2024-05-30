@@ -50,5 +50,4 @@ def get_data(path:str):
         third_channel = None, None
         print('Error loading third channel: ',e)
     
-
     return first_channel, second_channel, third_channel
