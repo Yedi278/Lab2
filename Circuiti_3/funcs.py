@@ -2,6 +2,8 @@ import os
 from IPython.display import Latex
 import numpy as np
 import pandas as pd
+from iminuit.cost import LeastSquares
+from iminuit import Minuit
 
 def rNan(arr): 
     '''This function removes NaN values from a numpy array'''
@@ -71,12 +73,19 @@ def find_zero(data,init=0, prec=0.001):
 
     i=init
 
-    if data[init] > prec:
+    if data[init] > 0.+prec:
         while data[i] > 0+prec:
             i += 1
         return data[i], i
 
     else:
-        while data[i] < 0-prec:
+        while data[i] < 0.-prec:
             i += 1
         return data[i], i
+    
+def chi_2_fit(x,y,yerr,model,kwargs):
+    c = LeastSquares(x, y, yerr, model)
+    m = Minuit(c, **kwargs)
+    m.fixed[*(kwargs.keys())] = True, True
+    m.migrad()
+    return m.fval, m.ndof
