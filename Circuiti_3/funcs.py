@@ -112,11 +112,12 @@ def analize(path, init=0, verbose=False)->tuple:
         V_CH1_SGN, V_MTH_SGN, dt_CH1_SGN, dt_MTH_SGN
     '''
     CH1, SGN, MTH = get_data(path)
+
     N = init
 
-    max_SGN, i_max_SGN = find_max(SGN[1], N, prec=0.00001)
-    max_CH1, i_max_CH1 = find_max(CH1[1], N, prec=0.00001)
-    max_MTH, i_max_MTH = find_max(MTH[1], N, prec=0.00001)
+    max_SGN, i_max_SGN = find_max(SGN[1], init=N, prec=0.00001)
+    max_CH1, i_max_CH1 = find_max(CH1[1], init=N, prec=0.00001)
+    max_MTH, i_max_MTH = find_max(MTH[1], init=N, prec=0.00001)
     z, i_zero_SGN = find_zero(SGN[1], N, prec=0.00001)
     z, i_zero_CH1 = find_zero(CH1[1],  _init=i_zero_SGN, prec=0.00001)
     z, i_zero_MTH = find_zero(MTH[1],  _init=i_zero_SGN, prec=0.00001)
@@ -136,7 +137,41 @@ def analize(path, init=0, verbose=False)->tuple:
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    path = 'data/RC/140000/'
-    CH1,SGN,MTH, V_CH1_SGN, V_MTH_SGN, dt_CH1_SGN, dt_MTH_SGN, max_CH1, max_SGN, max_MTH, i_max_CH1, i_max_SGN, i_max_MTH, i_zero_CH1, i_zero_SGN, i_zero_MTH = analize(path, init=200, verbose=True, interpol= False)
+    def sine(x, A, w, phi):
+        return A * np.sin(2 * np.pi * w * x + phi)
 
-    plt.plot(CH1[0],CH1[1], label='CH1')
+    def zero(f,xmin, xmax, init=None, prec=0.0001, kwargs=None):
+        if init != None:
+            i = init
+        else:
+            i = xmin
+
+        if f(i, **kwargs) > 0:
+            while f(i, **kwargs) > 0+prec:
+                i += prec
+            return i, f(i, **kwargs)
+        else:
+            while f(i, **kwargs) < 0-prec:
+                i += prec
+            return i, f(i, **kwargs)
+
+
+
+    path = 'data/RL/8500/'
+    CH1,SGN,MTH, V_CH1_SGN, V_MTH_SGN, dt_CH1_SGN, dt_MTH_SGN, max_CH1, max_SGN, max_MTH, i_max_CH1, i_max_SGN, i_max_MTH, i_zero_CH1, i_zero_SGN, i_zero_MTH = analize(path, init=200, verbose=True)
+
+    plt.plot(SGN[0],SGN[1], label='SGN')
+    # plt.plot(CH1[0],CH1[1], label='CH1')
+    # plt.plot(MTH[0],MTH[1], label='MTH')
+
+    c = LeastSquares(SGN[0], SGN[1], 0.001*np.ones(len(SGN[1])), sine)
+    m = Minuit(c, A=max_SGN, w=8500, phi=0)
+    m.migrad()
+
+    x = np.linspace(np.min(SGN[0]), np.max(SGN[0]), 1000)
+    plt.plot(x, sine(x, **m.values.to_dict()), label='fit')
+
+    xzero, yzero = zero(sine, np.min(SGN[0]), np.max(SGN[0]), kwargs=m.values.to_dict())
+    plt.scatter(xzero, yzero, label='zero', color='k')
+    plt.legend()
+    plt.show()
