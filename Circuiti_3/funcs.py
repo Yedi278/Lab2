@@ -103,16 +103,7 @@ def chi_2_fit(x,y,yerr,model,kwargs):
     m.migrad()
     return m.fval, m.ndof
 
-def sinusoidal(x, A, f, phi, c):
-    return A*np.sin(2*np.pi*f*x + phi) + c
-
-def inter_(CHX):
-    c = LeastSquares(CHX[0], CHX[1], 0.1, sinusoidal)
-    m = Minuit(c, A=1, f=1, phi=0, c=0)
-    m.migrad()
-    return m
-
-def analize(path, init=0, verbose=False, interpol = False)->tuple:
+def analize(path, init=0, verbose=False)->tuple:
     '''
     `path`: path to the data file
     `init`: initial guess for the maximum
@@ -135,11 +126,6 @@ def analize(path, init=0, verbose=False, interpol = False)->tuple:
 
     dt_CH1_SGN = np.abs(CH1[0][i_zero_CH1] - SGN[0][i_zero_SGN])
     dt_MTH_SGN = np.abs(MTH[0][i_zero_MTH] - SGN[0][i_zero_SGN])
-
-    if interpol:
-        m = inter_(CH1)
-        m.migrad()
-        return m
     
     if verbose:
         return CH1,SGN,MTH, V_CH1_SGN, V_MTH_SGN, dt_CH1_SGN, dt_MTH_SGN, max_CH1, max_SGN, max_MTH, i_max_CH1, i_max_SGN, i_max_MTH, i_zero_CH1, i_zero_SGN, i_zero_MTH
@@ -151,19 +137,6 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     path = 'data/RC/140000/'
-    m = analize(path, init=200, verbose=False, interpol= True)
-    m.migrad()
-    # m.visualize()
-    
-    x = np.linspace(-4e-6,4e-6,1000)
-    y = sinusoidal(x, **m.values.to_dict())
+    CH1,SGN,MTH, V_CH1_SGN, V_MTH_SGN, dt_CH1_SGN, dt_MTH_SGN, max_CH1, max_SGN, max_MTH, i_max_CH1, i_max_SGN, i_max_MTH, i_zero_CH1, i_zero_SGN, i_zero_MTH = analize(path, init=200, verbose=True, interpol= False)
 
-    a, l = bisezione(sinusoidal, -1e-6, 1e-6, kwargs=m.values.to_dict())
-
-    for i in l:
-        plt.scatter(i, sinusoidal(i, **m.values.to_dict()), color='red')
-    
-    plt.scatter(a, sinusoidal(a, **m.values.to_dict()))
-
-    plt.plot(x,y)
-    plt.show()
+    plt.plot(CH1[0],CH1[1], label='CH1')
