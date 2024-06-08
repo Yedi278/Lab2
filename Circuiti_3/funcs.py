@@ -97,6 +97,19 @@ def analize(path, frequency, verbose=False)->tuple:
     '''
     CH1, SGN, MTH = get_data(path)
 
+    if verbose:
+        m, zero_SGN, max_SGN = analize_inter(SGN, frequency, verbose=True)
+        m, zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN, verbose=True)
+        m, zero_MTH, max_MTH = analize_inter(MTH, frequency, init=zero_SGN, verbose=True)
+
+        V_SGN = max_CH1/max_SGN
+        V_MTH = max_MTH/max_SGN
+
+        dt_CH1 = np.abs(zero_SGN - zero_CH1)
+        dt_MTH = np.abs(zero_SGN - zero_MTH)
+
+        return CH1,SGN,MTH, V_SGN, V_MTH, dt_CH1, dt_MTH, zero_SGN, m
+    
     zero_SGN, max_SGN = analize_inter(SGN, frequency)
     zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN)
     zero_MTH, max_MTH = analize_inter(MTH, frequency, init=zero_SGN)
@@ -107,8 +120,6 @@ def analize(path, frequency, verbose=False)->tuple:
     dt_CH1 = np.abs(zero_SGN - zero_CH1)
     dt_MTH = np.abs(zero_SGN - zero_MTH)
 
-    if verbose:
-        return CH1,SGN,MTH, V_SGN, V_MTH, zero_CH1, zero_MTH, zero_SGN
     
     return V_SGN, V_MTH, dt_CH1, dt_MTH
 
