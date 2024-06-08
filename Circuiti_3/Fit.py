@@ -64,7 +64,7 @@ class Fit:
         # m.migrad()
         # m.hesse()
         # self.minuit = True
-        return m
+        return
 
     def scipy_chi2(self):
         '''Calculate the chi2 value for the scipy fit'''

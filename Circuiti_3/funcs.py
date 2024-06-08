@@ -95,15 +95,42 @@ def find_zero(data, _init=0, prec=0.001):
         while data[i] < 0.-prec:
             i += 1
         return data[i], i
-    
-def chi_2_fit(x,y,yerr,model,kwargs):
-    c = LeastSquares(x, y, yerr, model)
-    m = Minuit(c, **kwargs)
-    m.fixed[*(kwargs.keys())] = True, True
-    m.migrad()
-    return m.fval, m.ndof
 
-def analize(path, init=0, verbose=False)->tuple:
+def zero(f, xmin, xmax, prec=1e-6, kwargs=None):
+    
+    i=xmin
+    if f(i, **kwargs) > 0:
+        while f(i, **kwargs) > 0:
+            i += prec
+            if i > xmax:
+                raise ValueError('No zero found')
+    else:
+        while f(i, **kwargs) < 0:
+            i += prec
+            if i > xmax:
+                raise ValueError('No zero found')
+    return i
+
+def sine(x, A, w, phi):
+        return A * np.sin(2 * np.pi * w * x + phi)
+
+def analize_inter(CHX, freq, init=None, prec=1e-7, verbose=False):
+
+    if init == None:
+        _init = CHX[0][0]
+    else:
+        _init = init
+    c = LeastSquares(CHX[0], CHX[1], 0.01, sine)
+    m = Minuit(c, A=np.max(CHX[1]), w=freq, phi=0)
+    m.limits['A','w'] = (0,None),(freq-0.1*freq,freq+0.1*freq)
+    m.migrad()
+
+    if verbose:
+        return m, zero(sine, _init, np.max(CHX[0]), kwargs=m.values.to_dict(), prec=prec), m.values['A']
+    
+    return zero(sine, _init, np.max(CHX[0]), kwargs=m.values.to_dict(), prec=prec), m.values['A']
+
+def analize(path, frequency, init=0, verbose=False)->tuple:
     '''
     `path`: path to the data file
     `init`: initial guess for the maximum
@@ -115,63 +142,54 @@ def analize(path, init=0, verbose=False)->tuple:
 
     N = init
 
-    max_SGN, i_max_SGN = find_max(SGN[1], init=N, prec=0.00001)
-    max_CH1, i_max_CH1 = find_max(CH1[1], init=N, prec=0.00001)
-    max_MTH, i_max_MTH = find_max(MTH[1], init=N, prec=0.00001)
-    z, i_zero_SGN = find_zero(SGN[1], N, prec=0.00001)
-    z, i_zero_CH1 = find_zero(CH1[1],  _init=i_zero_SGN, prec=0.00001)
-    z, i_zero_MTH = find_zero(MTH[1],  _init=i_zero_SGN, prec=0.00001)
+    # max_SGN, i_max_SGN = find_max(SGN[1], init=N, prec=0.00001)
+    # max_CH1, i_max_CH1 = find_max(CH1[1], init=N, prec=0.00001)
+    # max_MTH, i_max_MTH = find_max(MTH[1], init=N, prec=0.00001)
+
+    zero_SGN, max_SGN = analize_inter(SGN, frequency)
+    zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN)
+    zero_MTH, max_MTH = analize_inter(MTH, frequency, init=zero_SGN)
 
     V_CH1_SGN = max_CH1/max_SGN
     V_MTH_SGN = max_MTH/max_SGN
 
-    dt_CH1_SGN = np.abs(CH1[0][i_zero_CH1] - SGN[0][i_zero_SGN])
-    dt_MTH_SGN = np.abs(MTH[0][i_zero_MTH] - SGN[0][i_zero_SGN])
-    
     if verbose:
-        return CH1,SGN,MTH, V_CH1_SGN, V_MTH_SGN, dt_CH1_SGN, dt_MTH_SGN, max_CH1, max_SGN, max_MTH, i_max_CH1, i_max_SGN, i_max_MTH, i_zero_CH1, i_zero_SGN, i_zero_MTH
-    
-    else:
-        return V_CH1_SGN, V_MTH_SGN, dt_CH1_SGN, dt_MTH_SGN
+        return CH1,SGN,MTH, V_CH1_SGN, V_MTH_SGN, zero_CH1, zero_MTH, zero_SGN
+    return V_CH1_SGN, V_MTH_SGN, zero_CH1, zero_MTH
+
     
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    def sine(x, A, w, phi):
-        return A * np.sin(2 * np.pi * w * x + phi)
-
-    def zero(f,xmin, xmax, init=None, prec=0.0001, kwargs=None):
-        if init != None:
-            i = init
-        else:
-            i = xmin
-
-        if f(i, **kwargs) > 0:
-            while f(i, **kwargs) > 0+prec:
-                i += prec
-            return i, f(i, **kwargs)
-        else:
-            while f(i, **kwargs) < 0-prec:
-                i += prec
-            return i, f(i, **kwargs)
-
-
-
     path = 'data/RL/8500/'
-    CH1,SGN,MTH, V_CH1_SGN, V_MTH_SGN, dt_CH1_SGN, dt_MTH_SGN, max_CH1, max_SGN, max_MTH, i_max_CH1, i_max_SGN, i_max_MTH, i_zero_CH1, i_zero_SGN, i_zero_MTH = analize(path, init=200, verbose=True)
 
-    plt.plot(SGN[0],SGN[1], label='SGN')
-    # plt.plot(CH1[0],CH1[1], label='CH1')
-    # plt.plot(MTH[0],MTH[1], label='MTH')
+    CH1,SGN,MTH, V_CH1_SGN, V_MTH_SGN, zero_CH1, zero_MTH, zero_SGN = analize(path, 8500, verbose=True)
 
-    c = LeastSquares(SGN[0], SGN[1], 0.001*np.ones(len(SGN[1])), sine)
-    m = Minuit(c, A=max_SGN, w=8500, phi=0)
-    m.migrad()
+    m3, xmin3 = analize_inter(SGN, 8500, verbose = True, prec=1e-7)
+    m, xmin = analize_inter(CH1, 8500, init=xmin3, verbose = True, prec=1e-7)
+    m2, xmin2 = analize_inter(MTH, 8500,init=xmin3, verbose = True, prec=1e-7)
+
 
     x = np.linspace(np.min(SGN[0]), np.max(SGN[0]), 1000)
-    plt.plot(x, sine(x, **m.values.to_dict()), label='fit')
+    plt.plot(x, sine(x, **m.values.to_dict()), label='CH1 fit')
+    plt.plot(x, sine(x, **m2.values.to_dict()), label='MTH fit')
+    plt.plot(x, sine(x, **m3.values.to_dict()), label='SGN fit')
 
-    xzero, yzero = zero(sine, np.min(SGN[0]), np.max(SGN[0]), kwargs=m.values.to_dict())
-    plt.scatter(xzero, yzero, label='zero', color='k')
-    plt.legend()
+    print('V_CH1_SGN: ', V_CH1_SGN)
+    print('V_MTH_SGN: ', V_MTH_SGN)
+    print('dt_CH1_SGN: ', np.abs(zero_SGN-zero_CH1), np.abs(xmin3-xmin))
+    print('dt_MTH_SGN: ', np.abs(zero_SGN-zero_MTH), np.abs(xmin3-xmin2)) 
+
+    plt.scatter(xmin, sine(xmin, **m.values.to_dict()), color='red', label='CH1 zero')
+    plt.scatter(xmin2, sine(xmin2, **m2.values.to_dict()), color='red', label='MTH zero')
+    plt.scatter(xmin3, sine(xmin3, **m3.values.to_dict()), color='red', label='SGN zero')
+
+    plt.scatter(zero_CH1, sine(zero_CH1, **m.values.to_dict()), color='green', label='CH1 zero')
+    plt.scatter(zero_MTH, sine(zero_MTH, **m2.values.to_dict()), color='green', label='MTH zero')
+    plt.scatter(zero_SGN, sine(zero_SGN, **m3.values.to_dict()), color='green', label='SGN zero')
+
+    plt.plot(SGN[0],SGN[1], label='SGN', lw=.5)
+    plt.plot(CH1[0],CH1[1], label='CH1', lw=.5)
+    plt.plot(MTH[0],MTH[1], label='MTH', lw=.5)
+    # plt.legend()
     plt.show()
