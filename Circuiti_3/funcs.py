@@ -9,7 +9,6 @@ def rNan(arr):
     '''This function removes NaN values from a numpy array'''
     return arr[~np.isnan(arr)]
 
-
 def find_file(path:str,name:str):
     '''This function finds the file with the name specified in the path specified'''
 
@@ -54,48 +53,6 @@ def get_data(path:str):
     
     return first_channel, second_channel, third_channel
 
-def bisezione (g, xMin, xMax, prec = 0.0001, kwargs=None):
-
-    xAve = xMin
-    l = []
-    while ((xMax - xMin) > prec) :
-        l.append(xAve)
-        xAve = 0.5 * (xMax + xMin)
-        if (g (xAve, **kwargs) * g (xMin, **kwargs) > 0.): 
-            xMin = xAve 
-        else:
-            xMax = xAve
-
-    return xAve, l
-
-def find_max(data,init=0, prec=0.001):
-    i = init
-    max = np.max(data[init:])
-    while data[i] < max-prec:
-        i += 1
-    return data[i], i
-
-def find_min(data,init=0, prec=0.001):
-    i = init
-    min = np.min(data[init:])
-    while data[i] > min+prec:
-        i += 1
-    return data[i], i
-
-def find_zero(data, _init=0, prec=0.001):
-
-    i=_init
-
-    if data[_init] > 0.+prec:
-        while data[i] > 0+prec:
-            i += 1
-        return data[i], i
-
-    else:
-        while data[i] < 0.-prec:
-            i += 1
-        return data[i], i
-
 def zero(f, xmin, xmax, prec=1e-6, kwargs=None):
     
     i=xmin
@@ -130,66 +87,65 @@ def analize_inter(CHX, freq, init=None, prec=1e-7, verbose=False):
     
     return zero(sine, _init, np.max(CHX[0]), kwargs=m.values.to_dict(), prec=prec), m.values['A']
 
-def analize(path, frequency, init=0, verbose=False)->tuple:
+def analize(path, frequency, verbose=False)->tuple:
     '''
     `path`: path to the data file
     `init`: initial guess for the maximum
     `verbose`: if True, returns all the data, if False, returns only the relevant data
     `return`: tuple with the relevant data as follows:
-        V_CH1_SGN, V_MTH_SGN, dt_CH1_SGN, dt_MTH_SGN
+        V_SGN, V_MTH, zero_CH1, zero_MTH
     '''
     CH1, SGN, MTH = get_data(path)
-
-    N = init
-
-    # max_SGN, i_max_SGN = find_max(SGN[1], init=N, prec=0.00001)
-    # max_CH1, i_max_CH1 = find_max(CH1[1], init=N, prec=0.00001)
-    # max_MTH, i_max_MTH = find_max(MTH[1], init=N, prec=0.00001)
 
     zero_SGN, max_SGN = analize_inter(SGN, frequency)
     zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN)
     zero_MTH, max_MTH = analize_inter(MTH, frequency, init=zero_SGN)
 
-    V_CH1_SGN = max_CH1/max_SGN
-    V_MTH_SGN = max_MTH/max_SGN
+    V_SGN = max_CH1/max_SGN
+    V_MTH = max_MTH/max_SGN
+
+    dt_CH1 = np.abs(zero_SGN - zero_CH1)
+    dt_MTH = np.abs(zero_SGN - zero_MTH)
 
     if verbose:
-        return CH1,SGN,MTH, V_CH1_SGN, V_MTH_SGN, zero_CH1, zero_MTH, zero_SGN
-    return V_CH1_SGN, V_MTH_SGN, zero_CH1, zero_MTH
-
+        return CH1,SGN,MTH, V_SGN, V_MTH, zero_CH1, zero_MTH, zero_SGN
     
-if __name__ == '__main__':
-    import matplotlib.pyplot as plt
-
-    path = 'data/RL/8500/'
-
-    CH1,SGN,MTH, V_CH1_SGN, V_MTH_SGN, zero_CH1, zero_MTH, zero_SGN = analize(path, 8500, verbose=True)
-
-    m3, xmin3 = analize_inter(SGN, 8500, verbose = True, prec=1e-7)
-    m, xmin = analize_inter(CH1, 8500, init=xmin3, verbose = True, prec=1e-7)
-    m2, xmin2 = analize_inter(MTH, 8500,init=xmin3, verbose = True, prec=1e-7)
+    return V_SGN, V_MTH, dt_CH1, dt_MTH
 
 
-    x = np.linspace(np.min(SGN[0]), np.max(SGN[0]), 1000)
-    plt.plot(x, sine(x, **m.values.to_dict()), label='CH1 fit')
-    plt.plot(x, sine(x, **m2.values.to_dict()), label='MTH fit')
-    plt.plot(x, sine(x, **m3.values.to_dict()), label='SGN fit')
 
-    print('V_CH1_SGN: ', V_CH1_SGN)
-    print('V_MTH_SGN: ', V_MTH_SGN)
-    print('dt_CH1_SGN: ', np.abs(zero_SGN-zero_CH1), np.abs(xmin3-xmin))
-    print('dt_MTH_SGN: ', np.abs(zero_SGN-zero_MTH), np.abs(xmin3-xmin2)) 
 
-    plt.scatter(xmin, sine(xmin, **m.values.to_dict()), color='red', label='CH1 zero')
-    plt.scatter(xmin2, sine(xmin2, **m2.values.to_dict()), color='red', label='MTH zero')
-    plt.scatter(xmin3, sine(xmin3, **m3.values.to_dict()), color='red', label='SGN zero')
+# if __name__ == '__main__':
+#     import matplotlib.pyplot as plt
 
-    plt.scatter(zero_CH1, sine(zero_CH1, **m.values.to_dict()), color='green', label='CH1 zero')
-    plt.scatter(zero_MTH, sine(zero_MTH, **m2.values.to_dict()), color='green', label='MTH zero')
-    plt.scatter(zero_SGN, sine(zero_SGN, **m3.values.to_dict()), color='green', label='SGN zero')
+#     path = 'data/RL/1250/'
 
-    plt.plot(SGN[0],SGN[1], label='SGN', lw=.5)
-    plt.plot(CH1[0],CH1[1], label='CH1', lw=.5)
-    plt.plot(MTH[0],MTH[1], label='MTH', lw=.5)
-    # plt.legend()
-    plt.show()
+#     CH1,SGN,MTH, V_CH1_SGN, V_MTH_SGN, zero_CH1, zero_MTH, zero_SGN = analize(path, 1250, verbose=True)
+
+#     m3, xmin3, max_SGN = analize_inter(SGN, 1250, verbose = True, prec=1e-7)
+#     m, xmin, max_CH1 = analize_inter(CH1, 1250, init=xmin3, verbose = True, prec=1e-7)
+#     m2, xmin2, max_MTH = analize_inter(MTH, 1250,init=xmin3, verbose = True, prec=1e-7)
+
+#     x = np.linspace(np.min(SGN[0]), np.max(SGN[0]), 1000)
+#     plt.plot(x, sine(x, **m.values.to_dict()), label='CH1 fit')
+#     plt.plot(x, sine(x, **m2.values.to_dict()), label='MTH fit')
+#     plt.plot(x, sine(x, **m3.values.to_dict()), label='SGN fit')
+
+#     print('V_CH1_SGN: ', V_CH1_SGN)
+#     print('V_MTH_SGN: ', V_MTH_SGN)
+#     print('dt_CH1_SGN: ', np.abs(zero_SGN-zero_CH1), np.abs(xmin3-xmin))
+#     print('dt_MTH_SGN: ', np.abs(zero_SGN-zero_MTH), np.abs(xmin3-xmin2)) 
+
+#     plt.scatter(xmin, sine(xmin, **m.values.to_dict()), color='red', label='CH1 zero')
+#     plt.scatter(xmin2, sine(xmin2, **m2.values.to_dict()), color='red', label='MTH zero')
+#     plt.scatter(xmin3, sine(xmin3, **m3.values.to_dict()), color='red', label='SGN zero')
+
+#     plt.scatter(zero_CH1, sine(zero_CH1, **m.values.to_dict()), color='green', label='CH1 zero')
+#     plt.scatter(zero_MTH, sine(zero_MTH, **m2.values.to_dict()), color='green', label='MTH zero')
+#     plt.scatter(zero_SGN, sine(zero_SGN, **m3.values.to_dict()), color='green', label='SGN zero')
+
+#     plt.plot(SGN[0],SGN[1], label='SGN', lw=.5)
+#     plt.plot(CH1[0],CH1[1], label='CH1', lw=.5)
+#     plt.plot(MTH[0],MTH[1], label='MTH', lw=.5)
+#     plt.legend()
+#     plt.show()
