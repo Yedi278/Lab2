@@ -64,12 +64,12 @@ def zero(f, xmin, xmax, prec=1e-6, kwargs=None):
     if f(i, **kwargs) > 0:
         while f(i, **kwargs) > 0:
             i += prec
-            if i > xmax+0.3*xmax:
+            if i > xmax+0.5*xmax:
                 raise ValueError('No zero found')
     else:
         while f(i, **kwargs) < 0:
             i += prec
-            if i > xmax+0.3*xmax:
+            if i > xmax+0.5*xmax:
                 raise ValueError('No zero found')
     return i
 
@@ -97,7 +97,7 @@ def analize_inter(CHX, freq, init=None, prec=1e-7, verbose=False):
     
     return _zero, m.values['A']
 
-def analize(path, frequency,prec=1e-7, verbose=False)->tuple:
+def analize(path, frequency,prec=1e-7, force=False, verbose=False)->tuple:
     '''
     `path`: path to the data file
     `init`: initial guess for the maximum
@@ -106,7 +106,11 @@ def analize(path, frequency,prec=1e-7, verbose=False)->tuple:
         V_SGN, V_MTH, zero_CH1, zero_MTH
     '''
     CH1, SGN, MTH = get_data(path)
+    
 
+    if force:
+        MTH = SGN[0], np.array(SGN[1]) - np.array(CH1[1])
+        
     if verbose:
         m2, zero_SGN, max_SGN = analize_inter(SGN, frequency, prec=prec, verbose=True)
         m1, zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN - prec, prec=prec, verbose=True)
@@ -127,8 +131,8 @@ def analize(path, frequency,prec=1e-7, verbose=False)->tuple:
     V_SGN = max_CH1/max_SGN
     V_MTH = max_MTH/max_SGN
 
-    dt_CH1 = np.abs(zero_SGN - zero_CH1)
-    dt_MTH = np.abs(zero_SGN - zero_MTH)
+    dt_CH1 = np.abs(zero_CH1 - zero_SGN)
+    dt_MTH = np.abs(zero_MTH - zero_SGN)
 
     
     return V_SGN, V_MTH, dt_CH1, dt_MTH
