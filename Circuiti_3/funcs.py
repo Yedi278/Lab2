@@ -52,8 +52,12 @@ def get_data(path:str):
     
     return first_channel, second_channel, third_channel
 
-def is_rising(f, x, prec=1e-7, kwargs=None):
+def is_rising(f, x, falling=False, prec=1e-7, kwargs=None):
     '''This function returns True if the signal is rising, False if it is falling'''
+    if falling:
+        if f(x-prec, **kwargs) > f(x+prec, **kwargs):
+            return True
+        return False
     if f(x-prec, **kwargs) < f(x+prec, **kwargs):
         return True
     return False
@@ -64,13 +68,13 @@ def zero(f, xmin, xmax, prec=1e-6, kwargs=None):
     if f(i, **kwargs) > 0:
         while f(i, **kwargs) > 0:
             i += prec
-            if i > xmax+0.5*xmax:
-                raise ValueError('No zero found')
+            # if i > xmax+0.5*xmax:
+            #     raise ValueError('No zero found')
     else:
         while f(i, **kwargs) < 0:
             i += prec
-            if i > xmax+0.5*xmax:
-                raise ValueError('No zero found')
+            # if i > xmax+0.5*xmax:
+            #     raise ValueError('No zero found')
     return i
 
 def sine(x, A, w, phi):
@@ -89,7 +93,7 @@ def analize_inter(CHX, freq, init=None, prec=1e-7, verbose=False):
 
     _zero = zero(sine, _init, np.max(CHX[0]), kwargs=m.values.to_dict(), prec=prec)
 
-    if not is_rising(sine, _zero, kwargs=m.values.to_dict()):
+    if not is_rising(sine, _zero, kwargs=m.values.to_dict(), falling=False):
         _zero = zero(sine, _zero, np.max(CHX[0]), kwargs=m.values.to_dict(), prec=prec)
 
     if verbose:
@@ -108,7 +112,7 @@ def analize(path, frequency,prec=1e-7, force=False, verbose=False)->tuple:
     CH1, SGN, MTH = get_data(path)
     
 
-    if force:
+    if force == True:
         MTH = SGN[0], np.array(SGN[1]) - np.array(CH1[1])
         
     if verbose:
@@ -119,20 +123,20 @@ def analize(path, frequency,prec=1e-7, force=False, verbose=False)->tuple:
         V_SGN = max_CH1/max_SGN
         V_MTH = max_MTH/max_SGN
 
-        dt_CH1 = np.abs(zero_SGN - zero_CH1)
-        dt_MTH = np.abs(zero_SGN - zero_MTH)
+        dt_CH1 = zero_CH1 - zero_SGN
+        dt_MTH = zero_MTH - zero_SGN
 
-        return CH1,SGN,MTH, V_SGN, V_MTH, zero_CH1, zero_SGN, zero_MTH, m1, m2, m3
+        return CH1,SGN,MTH, V_SGN, V_MTH, zero_CH1, zero_SGN, zero_MTH, m1, m2, m3, dt_CH1, dt_MTH
     
-    zero_SGN, max_SGN = analize_inter(SGN, frequency)
-    zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN)
-    zero_MTH, max_MTH = analize_inter(MTH, frequency, init=zero_SGN)
+    zero_SGN, max_SGN = analize_inter(SGN, frequency, prec=prec)
+    zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN, prec=prec)
+    zero_MTH, max_MTH = analize_inter(MTH, frequency, init=zero_SGN, prec=prec)
 
     V_SGN = max_CH1/max_SGN
     V_MTH = max_MTH/max_SGN
 
-    dt_CH1 = np.abs(zero_CH1 - zero_SGN)
-    dt_MTH = np.abs(zero_MTH - zero_SGN)
+    dt_CH1 = zero_SGN - zero_CH1
+    dt_MTH = zero_SGN - zero_MTH
 
     
     return V_SGN, V_MTH, dt_CH1, dt_MTH
