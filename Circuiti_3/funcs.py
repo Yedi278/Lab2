@@ -1,5 +1,4 @@
 import os
-from IPython.display import Latex
 import numpy as np
 import pandas as pd
 from iminuit.cost import LeastSquares
@@ -53,18 +52,24 @@ def get_data(path:str):
     
     return first_channel, second_channel, third_channel
 
+def is_rising(f, x, prec=1e-7, kwargs=None):
+    '''This function returns True if the signal is rising, False if it is falling'''
+    if f(x-prec, **kwargs) < f(x+prec, **kwargs):
+        return True
+    return False
+
 def zero(f, xmin, xmax, prec=1e-6, kwargs=None):
     
     i=xmin
     if f(i, **kwargs) > 0:
         while f(i, **kwargs) > 0:
             i += prec
-            if i > xmax:
+            if i > xmax+0.3*xmax:
                 raise ValueError('No zero found')
     else:
         while f(i, **kwargs) < 0:
             i += prec
-            if i > xmax:
+            if i > xmax+0.3*xmax:
                 raise ValueError('No zero found')
     return i
 
@@ -77,17 +82,22 @@ def analize_inter(CHX, freq, init=None, prec=1e-7, verbose=False):
         _init = CHX[0][0]
     else:
         _init = init
-    c = LeastSquares(CHX[0], CHX[1], 0.01, sine)
+    c = LeastSquares(CHX[0], CHX[1], 0.001, sine)
     m = Minuit(c, A=np.max(CHX[1]), w=freq, phi=0)
     m.limits['A','w'] = (0,None),(freq-0.1*freq,freq+0.1*freq)
     m.migrad()
 
-    if verbose:
-        return m, zero(sine, _init, np.max(CHX[0]), kwargs=m.values.to_dict(), prec=prec), m.values['A']
-    
-    return zero(sine, _init, np.max(CHX[0]), kwargs=m.values.to_dict(), prec=prec), m.values['A']
+    _zero = zero(sine, _init, np.max(CHX[0]), kwargs=m.values.to_dict(), prec=prec)
 
-def analize(path, frequency, verbose=False)->tuple:
+    if not is_rising(sine, _zero, kwargs=m.values.to_dict()):
+        _zero = zero(sine, _zero, np.max(CHX[0]), kwargs=m.values.to_dict(), prec=prec)
+
+    if verbose:
+        return m, _zero, m.values['A']
+    
+    return _zero, m.values['A']
+
+def analize(path, frequency,prec=1e-7, verbose=False)->tuple:
     '''
     `path`: path to the data file
     `init`: initial guess for the maximum
@@ -98,9 +108,9 @@ def analize(path, frequency, verbose=False)->tuple:
     CH1, SGN, MTH = get_data(path)
 
     if verbose:
-        m, zero_SGN, max_SGN = analize_inter(SGN, frequency, verbose=True)
-        m, zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN, verbose=True)
-        m, zero_MTH, max_MTH = analize_inter(MTH, frequency, init=zero_SGN, verbose=True)
+        m2, zero_SGN, max_SGN = analize_inter(SGN, frequency, prec=prec, verbose=True)
+        m1, zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN - prec, prec=prec, verbose=True)
+        m3, zero_MTH, max_MTH = analize_inter(MTH, frequency, init=zero_SGN - prec, prec=prec, verbose=True)
 
         V_SGN = max_CH1/max_SGN
         V_MTH = max_MTH/max_SGN
@@ -108,7 +118,7 @@ def analize(path, frequency, verbose=False)->tuple:
         dt_CH1 = np.abs(zero_SGN - zero_CH1)
         dt_MTH = np.abs(zero_SGN - zero_MTH)
 
-        return CH1,SGN,MTH, V_SGN, V_MTH, dt_CH1, dt_MTH, zero_SGN, m
+        return CH1,SGN,MTH, V_SGN, V_MTH, zero_CH1, zero_SGN, zero_MTH, m1, m2, m3
     
     zero_SGN, max_SGN = analize_inter(SGN, frequency)
     zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN)
