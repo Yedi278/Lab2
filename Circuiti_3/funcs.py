@@ -111,6 +111,7 @@ def analize(path, frequency,prec=1e-7, force=False, verbose=False)->tuple:
     '''
     CH1, SGN, MTH = get_data(path)
     
+    MTH = MTH[0], -np.array(MTH[1])
 
     if force == True:
         MTH = SGN[0], np.array(SGN[1]) - np.array(CH1[1])
