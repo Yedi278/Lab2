@@ -97,7 +97,7 @@ def analize_inter(CHX, freq, init=None, prec=1e-7, verbose=False):
         _zero = zero(sine, _zero, np.max(CHX[0]), kwargs=m.values.to_dict(), prec=prec)
 
     if verbose:
-        return m, _zero, m.values['A']
+        return m, _zero, m.values['A'], m.errors['A'], 
     
     return _zero, m.values['A']
 
@@ -111,7 +111,7 @@ def analize(path, frequency,prec=1e-7, force=False, verbose=False)->tuple:
     '''
     CH1, SGN, MTH = get_data(path)
     
-    MTH = MTH[0], -np.array(MTH[1])
+    # MTH = MTH[0], np.array(MTH[1])
 
     if force == True:
         MTH = SGN[0], np.array(SGN[1]) - np.array(CH1[1])
@@ -145,7 +145,12 @@ def analize(path, frequency,prec=1e-7, force=False, verbose=False)->tuple:
 
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    
+    from stats import*
+
+    a = formula_errori('A w phi', 'A*sin(2*pi*w*x+phi)')
+
 #     import matplotlib.pyplot as plt
 
 #     path = 'data/RL/1250/'
