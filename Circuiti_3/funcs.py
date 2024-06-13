@@ -97,7 +97,7 @@ def analize_inter(CHX, freq, init=None, prec=1e-7, verbose=False):
         _zero = zero(sine, _zero, np.max(CHX[0]), kwargs=m.values.to_dict(), prec=prec)
 
     if verbose:
-        return m, _zero, m.values['A'], m.errors['A'], 
+        return m, _zero, m.values['A'], m.errors['A'] 
     
     return _zero, m.values['A']
 
@@ -117,17 +117,20 @@ def analize(path, frequency,prec=1e-7, force=False, verbose=False)->tuple:
         MTH = SGN[0], np.array(SGN[1]) - np.array(CH1[1])
         
     if verbose:
-        m2, zero_SGN, max_SGN = analize_inter(SGN, frequency, prec=prec, verbose=True)
-        m1, zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN - prec, prec=prec, verbose=True)
-        m3, zero_MTH, max_MTH = analize_inter(MTH, frequency, init=zero_SGN - prec, prec=prec, verbose=True)
+        m2, zero_SGN, max_SGN, max_SGN_err = analize_inter(SGN, frequency, prec=prec, verbose=True)
+        m1, zero_CH1, max_CH1, max_CH1_err = analize_inter(CH1, frequency, init=zero_SGN - prec, prec=prec, verbose=True)
+        m3, zero_MTH, max_MTH, max_MTH_err = analize_inter(MTH, frequency, init=zero_SGN - prec, prec=prec, verbose=True)
 
         V_SGN = max_CH1/max_SGN
         V_MTH = max_MTH/max_SGN
 
+        V_SGN_err = 1/max_SGN * np.sqrt((max_CH1_err)**2 + (V_SGN*max_SGN_err)**2)
+        V_MTH_err = 1/max_SGN * np.sqrt((max_MTH_err)**2 + (V_MTH*max_SGN_err)**2)
+
         dt_CH1 = zero_CH1 - zero_SGN
         dt_MTH = zero_MTH - zero_SGN
 
-        return CH1,SGN,MTH, V_SGN, V_MTH, zero_CH1, zero_SGN, zero_MTH, m1, m2, m3, dt_CH1, dt_MTH
+        return CH1,SGN,MTH, V_SGN, V_MTH, zero_CH1, zero_SGN, zero_MTH, m1, m2, m3, dt_CH1, dt_MTH, V_SGN_err, V_MTH_err
     
     zero_SGN, max_SGN = analize_inter(SGN, frequency, prec=prec)
     zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN, prec=prec)
@@ -138,18 +141,17 @@ def analize(path, frequency,prec=1e-7, force=False, verbose=False)->tuple:
 
     dt_CH1 = zero_SGN - zero_CH1
     dt_MTH = zero_SGN - zero_MTH
-
     
     return V_SGN, V_MTH, dt_CH1, dt_MTH
 
 
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     
-    from stats import*
+#     from stats import*
 
-    a = formula_errori('A w phi', 'A*sin(2*pi*w*x+phi)')
+#     a = formula_errori('A w phi', 'A*sin(2*pi*w*x+phi)')
 
 #     import matplotlib.pyplot as plt
 
