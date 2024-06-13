@@ -76,14 +76,14 @@ class Fit:
         self.ndof = m.ndof
         return m
 
-    def visualize(self, cov = False, legend = None):
+    def visualize(self, cov = False, legend = None, npoints=1000):
         '''Visualize the data and the fit'''
 
         if cov == False:
             fig,ax = plt.subplots(1,1)
             plt.subplot(1,1,1)
             plt.scatter(self.x, self.y, label='data')
-            _x_range = np.linspace(min(self.x), max(self.x), 300)
+            _x_range = np.linspace(min(self.x), max(self.x), npoints)
             plt.plot(_x_range, self.model(_x_range, **self.values), label=f'fit \n $\chi^2$ = {round(self.fval/self.ndof, 2)}', color='red')
             plt.errorbar(self.x, self.y, yerr = self.error, fmt = 'o',capsize=5, color = 'black')
 
