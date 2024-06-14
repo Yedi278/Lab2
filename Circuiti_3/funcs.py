@@ -90,6 +90,7 @@ def analize_inter(CHX, freq, init=None, prec=1e-7, verbose=False):
     m = Minuit(c, A=np.max(CHX[1]), w=freq, phi=0)
     m.limits['A','w'] = (0,None),(freq-0.1*freq,freq+0.1*freq)
     m.migrad()
+    m.hesse()
 
     _zero = zero(sine, _init, np.max(CHX[0]), kwargs=m.values.to_dict(), prec=prec)
 
@@ -124,13 +125,15 @@ def analize(path, frequency,prec=1e-7, force=False, verbose=False)->tuple:
         V_SGN = max_CH1/max_SGN
         V_MTH = max_MTH/max_SGN
 
-        V_SGN_err = 1/max_SGN * np.sqrt((max_CH1_err)**2 + (V_SGN*max_SGN_err)**2)
-        V_MTH_err = 1/max_SGN * np.sqrt((max_MTH_err)**2 + (V_MTH*max_SGN_err)**2)
+        V_SGN_err = (1/max_SGN) * np.sqrt((max_CH1_err)**2 + (V_SGN*max_SGN_err)**2)
+        V_MTH_err = (1/max_SGN) * np.sqrt((max_MTH_err)**2 + (V_MTH*max_SGN_err)**2)
 
         dt_CH1 = zero_CH1 - zero_SGN
         dt_MTH = zero_MTH - zero_SGN
 
-        return CH1,SGN,MTH, V_SGN, V_MTH, zero_CH1, zero_SGN, zero_MTH, m1, m2, m3, dt_CH1, dt_MTH, V_SGN_err, V_MTH_err
+        zero_err = 2*prec*frequency
+
+        return CH1,SGN,MTH, V_SGN, V_MTH, zero_CH1, zero_SGN, zero_MTH, m1, m2, m3, dt_CH1, dt_MTH, V_SGN_err, V_MTH_err, zero_err
     
     zero_SGN, max_SGN = analize_inter(SGN, frequency, prec=prec)
     zero_CH1, max_CH1 = analize_inter(CH1, frequency, init=zero_SGN, prec=prec)
@@ -143,46 +146,3 @@ def analize(path, frequency,prec=1e-7, force=False, verbose=False)->tuple:
     dt_MTH = zero_SGN - zero_MTH
     
     return V_SGN, V_MTH, dt_CH1, dt_MTH
-
-
-
-
-# if __name__ == '__main__':
-    
-#     from stats import*
-
-#     a = formula_errori('A w phi', 'A*sin(2*pi*w*x+phi)')
-
-#     import matplotlib.pyplot as plt
-
-#     path = 'data/RL/1250/'
-
-#     CH1,SGN,MTH, V_CH1_SGN, V_MTH_SGN, zero_CH1, zero_MTH, zero_SGN = analize(path, 1250, verbose=True)
-
-#     m3, xmin3, max_SGN = analize_inter(SGN, 1250, verbose = True, prec=1e-7)
-#     m, xmin, max_CH1 = analize_inter(CH1, 1250, init=xmin3, verbose = True, prec=1e-7)
-#     m2, xmin2, max_MTH = analize_inter(MTH, 1250,init=xmin3, verbose = True, prec=1e-7)
-
-#     x = np.linspace(np.min(SGN[0]), np.max(SGN[0]), 1000)
-#     plt.plot(x, sine(x, **m.values.to_dict()), label='CH1 fit')
-#     plt.plot(x, sine(x, **m2.values.to_dict()), label='MTH fit')
-#     plt.plot(x, sine(x, **m3.values.to_dict()), label='SGN fit')
-
-#     print('V_CH1_SGN: ', V_CH1_SGN)
-#     print('V_MTH_SGN: ', V_MTH_SGN)
-#     print('dt_CH1_SGN: ', np.abs(zero_SGN-zero_CH1), np.abs(xmin3-xmin))
-#     print('dt_MTH_SGN: ', np.abs(zero_SGN-zero_MTH), np.abs(xmin3-xmin2)) 
-
-#     plt.scatter(xmin, sine(xmin, **m.values.to_dict()), color='red', label='CH1 zero')
-#     plt.scatter(xmin2, sine(xmin2, **m2.values.to_dict()), color='red', label='MTH zero')
-#     plt.scatter(xmin3, sine(xmin3, **m3.values.to_dict()), color='red', label='SGN zero')
-
-#     plt.scatter(zero_CH1, sine(zero_CH1, **m.values.to_dict()), color='green', label='CH1 zero')
-#     plt.scatter(zero_MTH, sine(zero_MTH, **m2.values.to_dict()), color='green', label='MTH zero')
-#     plt.scatter(zero_SGN, sine(zero_SGN, **m3.values.to_dict()), color='green', label='SGN zero')
-
-#     plt.plot(SGN[0],SGN[1], label='SGN', lw=.5)
-#     plt.plot(CH1[0],CH1[1], label='CH1', lw=.5)
-#     plt.plot(MTH[0],MTH[1], label='MTH', lw=.5)
-#     plt.legend()
-#     plt.show()
